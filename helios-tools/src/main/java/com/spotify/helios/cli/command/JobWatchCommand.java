@@ -17,12 +17,8 @@
 
 package com.spotify.helios.cli.command;
 
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-import com.google.common.util.concurrent.ListenableFuture;
+import static java.lang.String.format;
+import static net.sourceforge.argparse4j.impl.Arguments.storeTrue;
 
 import com.spotify.helios.cli.Target;
 import com.spotify.helios.client.HeliosClient;
@@ -31,10 +27,14 @@ import com.spotify.helios.common.descriptors.JobId;
 import com.spotify.helios.common.descriptors.JobStatus;
 import com.spotify.helios.common.descriptors.TaskStatus;
 
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+import com.google.common.util.concurrent.ListenableFuture;
 import net.sourceforge.argparse4j.inf.Argument;
 import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparser;
-
 import org.joda.time.Instant;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -47,11 +47,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
-
-import static com.spotify.helios.cli.Utils.allAsMap;
-import static com.spotify.helios.cli.command.JobStatusFetcher.getJobsStatuses;
-import static java.lang.String.format;
-import static net.sourceforge.argparse4j.impl.Arguments.storeTrue;
 
 public class JobWatchCommand extends MultiTargetControlCommand {
 
@@ -150,7 +145,7 @@ public class JobWatchCommand extends MultiTargetControlCommand {
   private static void showReport(PrintStream out, boolean exact, final List<String> prefixes,
       final Set<JobId> jobIds, final DateTimeFormatter formatter, final HeliosClient client)
       throws ExecutionException, InterruptedException {
-    final Map<JobId, JobStatus> statuses = getStatuses(client, jobIds);
+    final Map<JobId, JobStatus> statuses = client.jobStatuses(jobIds).get();
 
     for (final JobId jobId : jobIds) {
       final JobStatus jobStatus = statuses.get(jobId);
@@ -203,10 +198,6 @@ public class JobWatchCommand extends MultiTargetControlCommand {
   private static Map<JobId, JobStatus> getStatuses(final HeliosClient client,
                                                    final Set<JobId> jobIds)
       throws ExecutionException, InterruptedException {
-    final Map<JobId, ListenableFuture<JobStatus>> futures = getJobsStatuses(client, jobIds);
-
-    final Map<JobId, JobStatus> statuses = Maps.newTreeMap();
-    statuses.putAll(allAsMap(futures));
-    return statuses;
+    return client.jobStatuses(jobIds).get();
   }
 }

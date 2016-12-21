@@ -30,7 +30,6 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Ordering;
-import com.google.common.util.concurrent.ListenableFuture;
 
 import net.sourceforge.argparse4j.inf.Argument;
 import net.sourceforge.argparse4j.inf.Namespace;
@@ -46,15 +45,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 public class Utils {
-
-  public static <K, V> Map<K, V> allAsMap(final Map<K, ListenableFuture<V>> map)
-      throws ExecutionException, InterruptedException {
-    final Map<K, V> result = Maps.newHashMap();
-    for (final Map.Entry<K, ListenableFuture<V>> e : map.entrySet()) {
-      result.put(e.getKey(), e.getValue().get());
-    }
-    return result;
-  }
 
   public static HeliosClient getClient(final Target target, final PrintStream err,
                                        final String username, final Namespace options) {

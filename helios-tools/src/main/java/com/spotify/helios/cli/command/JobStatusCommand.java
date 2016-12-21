@@ -17,13 +17,10 @@
 
 package com.spotify.helios.cli.command;
 
-import com.google.common.base.Joiner;
-import com.google.common.base.Strings;
-import com.google.common.collect.FluentIterable;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Ordering;
-import com.google.common.collect.Sets;
-import com.google.common.util.concurrent.ListenableFuture;
+import static com.google.common.base.Predicates.containsPattern;
+import static com.spotify.helios.cli.Output.formatHostname;
+import static com.spotify.helios.cli.Output.jobStatusTable;
+import static net.sourceforge.argparse4j.impl.Arguments.storeTrue;
 
 import com.spotify.helios.cli.JobStatusTable;
 import com.spotify.helios.client.HeliosClient;
@@ -34,6 +31,12 @@ import com.spotify.helios.common.descriptors.JobId;
 import com.spotify.helios.common.descriptors.JobStatus;
 import com.spotify.helios.common.descriptors.TaskStatus;
 
+import com.google.common.base.Joiner;
+import com.google.common.base.Strings;
+import com.google.common.collect.FluentIterable;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Ordering;
+import com.google.common.collect.Sets;
 import net.sourceforge.argparse4j.inf.Argument;
 import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparser;
@@ -44,12 +47,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
-
-import static com.google.common.base.Predicates.containsPattern;
-import static com.spotify.helios.cli.Output.formatHostname;
-import static com.spotify.helios.cli.Output.jobStatusTable;
-import static com.spotify.helios.cli.Utils.allAsMap;
-import static net.sourceforge.argparse4j.impl.Arguments.storeTrue;
 
 public class JobStatusCommand extends ControlCommand {
 
@@ -111,11 +108,8 @@ public class JobStatusCommand extends ControlCommand {
       return 1;
     }
 
-    // TODO (dano): it would sure be nice to be able to report container/task uptime
-    final Map<JobId, ListenableFuture<JobStatus>> futures = 
-        JobStatusFetcher.getJobsStatuses(client, jobIds);
     final Map<JobId, JobStatus> statuses = Maps.newTreeMap();
-    statuses.putAll(allAsMap(futures));
+    statuses.putAll(client.jobStatuses(jobIds).get());
 
     if (json) {
       showJsonStatuses(out, hostPattern, jobIds, statuses);
