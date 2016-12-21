@@ -17,10 +17,18 @@
 
 package com.spotify.helios.servicescommon;
 
-import com.google.common.io.CharStreams;
+import static com.google.common.base.Charsets.UTF_8;
+import static com.google.common.base.Optional.fromNullable;
+import static com.google.common.base.Throwables.propagate;
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static net.sourceforge.argparse4j.impl.Arguments.SUPPRESS;
+import static net.sourceforge.argparse4j.impl.Arguments.append;
+import static net.sourceforge.argparse4j.impl.Arguments.fileType;
+import static net.sourceforge.argparse4j.impl.Arguments.storeTrue;
 
 import com.spotify.helios.common.LoggingConfig;
 
+import com.google.common.io.CharStreams;
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.impl.Arguments;
 import net.sourceforge.argparse4j.inf.Argument;
@@ -39,15 +47,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import static com.google.common.base.Charsets.UTF_8;
-import static com.google.common.base.Optional.fromNullable;
-import static com.google.common.base.Throwables.propagate;
-import static java.util.concurrent.TimeUnit.SECONDS;
-import static net.sourceforge.argparse4j.impl.Arguments.SUPPRESS;
-import static net.sourceforge.argparse4j.impl.Arguments.append;
-import static net.sourceforge.argparse4j.impl.Arguments.fileType;
-import static net.sourceforge.argparse4j.impl.Arguments.storeTrue;
 
 /**
  * Handles parsing common commandline arguments for the agent and master.
@@ -71,7 +70,6 @@ public class ServiceParser {
   private final Argument zooKeeperAclAgentUser;
   private final Argument noMetricsArg;
   private final Argument statsdHostPortArg;
-  private final Argument riemannHostPortArg;
   private final Argument verboseArg;
   private final Argument syslogArg;
   private final Argument logconfigArg;
@@ -155,11 +153,6 @@ public class ServiceParser {
     statsdHostPortArg = parser.addArgument("--statsd-host-port")
         .setDefault((String) null)
         .help("host:port of where to send statsd metrics "
-              + "(to be useful, --no-metrics must *NOT* be specified)");
-
-    riemannHostPortArg = parser.addArgument("--riemann-host-port")
-        .setDefault((String) null)
-        .help("host:port of where to send riemann events and metrics "
               + "(to be useful, --no-metrics must *NOT* be specified)");
 
     verboseArg = parser.addArgument("-v", "--verbose")
@@ -266,10 +259,6 @@ public class ServiceParser {
 
   public String getName() {
     return options.getString(nameArg.getDest());
-  }
-
-  public String getRiemannHostPort() {
-    return options.getString(riemannHostPortArg.getDest());
   }
 
   public String getStatsdHostPort() {

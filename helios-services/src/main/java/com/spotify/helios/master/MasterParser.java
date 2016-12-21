@@ -17,10 +17,12 @@
 
 package com.spotify.helios.master;
 
-import com.google.common.collect.ImmutableSet;
+import static net.sourceforge.argparse4j.impl.Arguments.append;
+import static net.sourceforge.argparse4j.impl.Arguments.storeTrue;
 
 import com.spotify.helios.servicescommon.ServiceParser;
 
+import com.google.common.collect.ImmutableSet;
 import net.sourceforge.argparse4j.inf.Argument;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
@@ -29,9 +31,6 @@ import net.sourceforge.argparse4j.inf.Namespace;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
-
-import static net.sourceforge.argparse4j.impl.Arguments.append;
-import static net.sourceforge.argparse4j.impl.Arguments.storeTrue;
 
 /**
  * Parses command-line arguments to produce the {@link MasterConfig}.
@@ -78,7 +77,6 @@ public class MasterParser extends ServiceParser {
         .setDomain(getDomain())
         .setName(getName())
         .setStatsdHostPort(getStatsdHostPort())
-        .setRiemannHostPort(getRiemannHostPort())
         .setInhibitMetrics(getInhibitMetrics())
         .setSentryDsn(getSentryDsn())
         .setServiceRegistryAddress(getServiceRegistryAddress())
